@@ -4,3 +4,6 @@
 3. (DONE) `include` keywords get changed to `#include`
 4. (DONE) Handle colon plus indentation -> brackets, except with `case`
 5. Handle `default` keyword
+
+
+Single line blocks?

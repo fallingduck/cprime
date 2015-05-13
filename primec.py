@@ -60,7 +60,7 @@ def firstpass(code):
                 print(line)
                 raise RuntimeError('Expected indent!')
 
-        if len(newindent) != len(oldindent):
+        while len(newindent) != len(oldindent):
             if newindent == ''.join(indents[:-1]):
                 indent -= 1
                 indents.pop()
@@ -69,6 +69,18 @@ def firstpass(code):
                 else:
                     newcode.append('{0}}}'.format(newindent))
                 blocksarecase.pop()
+                break
+            elif len(newindent) < len(oldindent):
+                indent -= 1
+                indents.pop()
+                if blocksarecase[-1]:
+                    newcode.append('{0}break;'.format(oldindent))
+                else:
+                    newcode.append('{0}}}'.format(''.join(indents)))
+                blocksarecase.pop()
+                newindent = indentation.search(line)
+                newindent = newindent.group(1) if newindent else ''
+                oldindent = ''.join(indents)
             else:
                 print(line)
                 raise RuntimeError('Indentation mismatch!')

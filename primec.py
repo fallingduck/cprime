@@ -23,7 +23,7 @@ startindent = re.compile(r':$')
 def strip_comments(code):
     code = singleline.sub('\n', code)
     code = multiline.sub('', code)
-    return code
+    return code.rstrip()
 
 
 def firstpass(code):

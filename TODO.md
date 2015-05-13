@@ -12,3 +12,6 @@ Passing `void` to a function is ugly and pretty much unnecessary, because
 variable argument functions are generally not good ideas anyway. I'm going the
 C++ route here, I think, so `void f()` should become `void f(void)` in the
 compiled code.
+
+How about a `nobreak` statement, to allow a "fall-through" in `case`
+blocks?

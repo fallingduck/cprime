@@ -20,3 +20,4 @@ int main():
             printf("How about a nice game of chess?\n")
         default:
             printf("Bye!")
+    return 0

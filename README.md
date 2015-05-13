@@ -58,4 +58,27 @@ int main():
             printf("How about a nice game of chess?\n")
         default:
             printf("Bye!")
+    return 0
+```
+
+```
+include <stdio.h>
+
+void loop1():
+    for (int x = 0; x < 10; x++):
+        printf("%d\n", x)
+
+void loop2():
+    int x = 0
+    while x < 10:
+        printf("%d\n", x)
+        x++
+
+void loop3():
+    int x
+    x = 0
+    do:
+        // "Hello, World!" is printed one time
+        printf("Hello, World!\n")
+    while x != 0
 ```

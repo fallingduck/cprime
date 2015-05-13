@@ -1,2 +1,5 @@
-1. Strip comments
-2. 
+### First Pass
+1. (DONE) Strip comments
+2. (DONE) Preprocessor commands carry through
+3. (DONE) `include` keywords get changed to `#include`
+4. (DONE) Handle colon plus indentation -> brackets, except with `case`

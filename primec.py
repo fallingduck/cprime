@@ -13,6 +13,7 @@ preprocess  = re.compile(r'^\s*#')
 include     = re.compile(r'^(\s*)include(\s)')
 
 indentation = re.compile(r'^(\s*)\S')
+blankline   = re.compile(r'^\s*$')
 
 case        = re.compile(r'^\s*case.*?:$')
 onelinecase = re.compile(r'^\s*case.*?:.+$')
@@ -32,8 +33,12 @@ def firstpass(code):
     indents = []
     blocksarecase = [False]
     for line in code:
+        if blankline.search(line):
+            continue
+
         line = line.rstrip()
-        newindent = indentation.search(line).group(1)
+        newindent = indentation.search(line)
+        newindent = newindent.group(1) if newindent else ''
         oldindent = ''.join(indents)
 
         if preprocess.search(line):
@@ -41,17 +46,18 @@ def firstpass(code):
             continue
 
         if include.search(line):
-            line = include.sub(r'\g<1>#include\g<2>', count=1)
+            line = include.sub(r'\g<1>#include\g<2>', line, count=1)
             newcode.append(line)
             continue
 
         if len(indents) < indent:
-            if len(newindent) > oldindent:
+            if len(newindent) > len(oldindent):
                 indents.append(newindent[len(oldindent):])
                 if not blocksarecase[-1]:
                     newcode.append('{0}{{'.format(oldindent))
                 oldindent = ''.join(indents)
             else:
+                print(line)
                 raise RuntimeError('Expected indent!')
 
         if len(newindent) != len(oldindent):
@@ -64,23 +70,31 @@ def firstpass(code):
                     newcode.append('{0}}}'.format(newindent))
                 blocksarecase.pop()
             else:
+                print(line)
                 raise RuntimeError('Indentation mismatch!')
 
         if onelinecase.search(line):
             line = '{0}; break;'.format(line)
-            newcode.append(line)
-            continue
 
-        if case.search(line):
-            newcode.append(line)
+        elif case.search(line):
             indent += 1
             blocksarecase.append(True)
-            continue
 
-        if startindent.search(line):
-            line = startindent.sub('')
+        elif startindent.search(line):
+            line = startindent.sub('', line)
             indent += 1
             blocksarecase.append(False)
+
+        newcode.append(line)
+
+    while indent:
+        if blocksarecase[-1]:
+            newcode.append('{0}break;'.format(''.join(indents)))
+        else:
+            newcode.append('{0}}}'.format(''.join(indents[:-1])))
+        blocksarecase.pop()
+        indent -= 1
+        indents.pop()
 
     return '\n'.join(newcode)
 

@@ -5,9 +5,11 @@ makeover of JavaScript, C-Prime believes that C can become more beautiful,
 more readable, and easier to write. C-Prime has the exact same syntax as C,
 but with a Python-inspired grammar. (Or maybe it's the other way around?)
 
+C-Prime compiles to C99.
+
 ### 1.0????
 
-Haha, yeah right. Right now, C-Prime is in a "pre-release" state. This means
+Haha, good one m8. Right now, C-Prime is in a "pre-release" state. This means
 that it should *not* be used to write programs, although you can still play
 around with the compiler a bit.
 

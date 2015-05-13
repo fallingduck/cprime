@@ -5,6 +5,8 @@ import re
 import sys
 
 
+escapednewline = re.compile(r'\\\n')
+
 singleline  = re.compile(r'\n?\s*\/{2}.*?\n')
 multiline   = re.compile(r'\/\*.*?\*\/', re.DOTALL)  # In C99, comments
                                                      # don't nest!
@@ -114,7 +116,8 @@ def firstpass(code):
 def main(filepath):
     with open(filepath, 'r') as fp:
         code = fp.read()
-    code = strip_comments(code).split('\n')
+    code = strip_comments(code)
+    code = escapednewline.sub(' ', code)
     newcode = firstpass(code)
     print(newcode)
 

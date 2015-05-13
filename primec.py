@@ -15,8 +15,8 @@ include     = re.compile(r'^(\s*)include(\s)')
 indentation = re.compile(r'^(\s*)\S')
 blankline   = re.compile(r'^\s*$')
 
-case        = re.compile(r'^\s*case.*?:$')
-onelinecase = re.compile(r'^\s*case.*?:.+$')
+case        = re.compile(r'^\s*(case|default).*?:$')
+onelinecase = re.compile(r'^\s*(case|default).*?:.+$')
 startindent = re.compile(r':$')
 
 

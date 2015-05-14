@@ -2,10 +2,12 @@
 
 C-Prime is C without all the clutter. Inspired in part by CoffeeScript's
 makeover of JavaScript, C-Prime believes that C can become more beautiful,
-more readable, and easier to write. C-Prime has the exact same syntax as C,
-but with a Python-inspired grammar. (Or maybe it's the other way around?)
+more readable, and easier to write. C-Prime is not a new language, however. It
+is simply a more beautiful way of writing C code. C-Prime code then gets
+directly transpiled to C code, to be compiled by your system's C compiler.
 
-C-Prime compiles to C99.
+Basically, C-Prime doesn't get in the way of C grammar, but provides a less
+cluttered (and in some cases less error-prone) way of writing it.
 
 ### 1.0????
 

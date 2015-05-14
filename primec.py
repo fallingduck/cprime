@@ -7,19 +7,21 @@ import sys
 
 escapednewline = re.compile(r'\\\n')
 
-singleline  = re.compile(r'\n?\s*\/{2}.*?\n')
-multiline   = re.compile(r'\/\*.*?\*\/', re.DOTALL)  # In C99, comments
-                                                     # don't nest!
+singleline     = re.compile(r'\n?\s*\/{2}.*?\n')
+multiline      = re.compile(r'\/\*.*?\*\/', re.DOTALL) # In C99, comments
+                                                       # don't nest!
 
-preprocess  = re.compile(r'^\s*#')
-include     = re.compile(r'^(\s*)include(\s)')
+preprocess     = re.compile(r'^\s*#')
+include        = re.compile(r'^(\s*)include(\s)')
 
-indentation = re.compile(r'^(\s*)\S')
-blankline   = re.compile(r'^\s*$')
+indentation    = re.compile(r'^(\s*)\S')
+blankline      = re.compile(r'^\s*$')
 
-case        = re.compile(r'^\s*(case|default).*?:$')
-onelinecase = re.compile(r'^\s*(case|default).*?:.+$')
-startindent = re.compile(r':$')
+case           = re.compile(r'^\s*(case|default).*?:$')
+onelinecase    = re.compile(r'^\s*(case|default).*?:.+$')
+startindent    = re.compile(r':$')
+
+cprimeinclude  = re.compile(r'^(\s*)require\s+"(.+?)\.hpr"$')
 
 
 def strip_comments(code):
@@ -28,7 +30,7 @@ def strip_comments(code):
     return code.rstrip()
 
 
-def firstpass(code):
+def transpile(code, includes):
     """First pass through: broader scope"""
     newcode = []
     indent = 0
@@ -50,6 +52,13 @@ def firstpass(code):
         if include.search(line):
             line = include.sub(r'\g<1>#include\g<2>', line, count=1)
             newcode.append(line)
+            continue
+
+        match = cprimeinclude.search(line)
+        if match:
+            line = cprimeinclude.sub(r'\g<1>#include "\g<2>.h"', line)
+            newcode.append(line)
+            includes.append('{0}.hpr'.format(match.group(2)))
             continue
 
         if len(indents) < indent:
@@ -118,7 +127,9 @@ def main(filepath):
         code = fp.read()
     code = strip_comments(code)
     code = escapednewline.sub(' ', code)
-    newcode = firstpass(code)
+    includes = []
+    included = []  # List of hashes, so we only include anything once
+    newcode = transpile(code, includes)
     print(newcode)
 
 

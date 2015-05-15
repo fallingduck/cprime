@@ -127,6 +127,7 @@ def main(filepath):
         code = fp.read()
     code = strip_comments(code)
     code = escapednewline.sub(' ', code)
+    code = code.split('\n')
     includes = []
     included = []  # List of hashes, so we only include anything once
     newcode = transpile(code, includes)

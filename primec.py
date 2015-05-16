@@ -30,6 +30,18 @@ def strip_comments(code):
     return code.rstrip()
 
 
+def parse_line(line):
+    """This mostly focusses on adding in parentheses where required, adding
+    semicolons where required, and converting keywords like `and`, `or`, and
+    `not` to their respective C operators.
+    """
+
+    if onelinecase.search(line):
+        line = '{0}; break;'.format(line)
+
+    return line
+
+
 def transpile(code, includes):
     """First pass through: broader scope"""
     newcode = []
@@ -96,18 +108,15 @@ def transpile(code, includes):
                 print(line)
                 raise RuntimeError('Indentation mismatch!')
 
-        if onelinecase.search(line):
-            line = '{0}; break;'.format(line)
-
-        elif case.search(line):
+        if case.search(line):
             indent += 1
             blocksarecase.append(True)
 
         elif startindent.search(line):
-            line = startindent.sub('', line)
             indent += 1
             blocksarecase.append(False)
 
+        line = parse_line(line)
         newcode.append(line)
 
     while indent:

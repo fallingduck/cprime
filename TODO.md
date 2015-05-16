@@ -6,12 +6,21 @@
 5. (DONE) Handle `default` keyword
 8. (DONE) C-Prime preprocessor commands
 
+### Second Pass
+This mostly focusses on adding in parentheses where required, adding semicolons
+where required, and converting keywords like `and`, `or`, and `not` to their
+respective C operators.
+
 ### Post-Processing
 1. Handle transpiling includes
 
 ### Comments
 
 Move individual searches out of `primec.py`!
+
+Currently a one-line case/default block is handled in the first pass of the
+transpilation process. This probably fits more into the second pass (line
+parsing).
 
 Passing `void` to a function is ugly and pretty much unnecessary, because
 non-specified argument functions are generally not good ideas anyway. I'm going

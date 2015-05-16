@@ -13,6 +13,7 @@ multiline      = re.compile(r'\/\*.*?\*\/', re.DOTALL) # In C99, comments
 
 preprocess     = re.compile(r'^\s*#')
 include        = re.compile(r'^(\s*)include(\s)')
+cprimeinclude  = re.compile(r'^(\s*)include\s+"(.+?)\.hpr"$')
 
 indentation    = re.compile(r'^(\s*)\S')
 blankline      = re.compile(r'^\s*$')
@@ -20,8 +21,9 @@ blankline      = re.compile(r'^\s*$')
 case           = re.compile(r'^\s*(case|default).*?:$')
 onelinecase    = re.compile(r'^\s*(case|default).*?:.+$')
 startindent    = re.compile(r':$')
+reqsemicolon   = re.compile(r'^\s*(struct|enum).*?:$')
 
-cprimeinclude  = re.compile(r'^(\s*)require\s+"(.+?)\.hpr"$')
+strings        = re.compile(r'".*?[^\\]"')
 
 
 def strip_comments(code):
@@ -48,6 +50,7 @@ def transpile(code, includes):
     indent = 0
     indents = []
     blocksarecase = [False]
+    blockrequiressemicolon = [False]
     for line in code:
         if blankline.search(line):
             continue
@@ -61,16 +64,16 @@ def transpile(code, includes):
             newcode.append(line)
             continue
 
-        if include.search(line):
-            line = include.sub(r'\g<1>#include\g<2>', line, count=1)
-            newcode.append(line)
-            continue
-
         match = cprimeinclude.search(line)
         if match:
             line = cprimeinclude.sub(r'\g<1>#include "\g<2>.h"', line)
             newcode.append(line)
             includes.append('{0}.hpr'.format(match.group(2)))
+            continue
+
+        if include.search(line):
+            line = include.sub(r'\g<1>#include\g<2>', line, count=1)
+            newcode.append(line)
             continue
 
         if len(indents) < indent:
@@ -90,8 +93,10 @@ def transpile(code, includes):
                 if blocksarecase[-1]:
                     newcode.append('{0}break;'.format(oldindent))
                 else:
-                    newcode.append('{0}}}'.format(newindent))
+                    newcode.append('{0}}}{1}'.format(newindent,
+                        ';' if blockrequiressemicolon[-1] else ''))
                 blocksarecase.pop()
+                blockrequiressemicolon.pop()
                 break
             elif len(newindent) < len(oldindent):
                 indent -= 1
@@ -99,8 +104,10 @@ def transpile(code, includes):
                 if blocksarecase[-1]:
                     newcode.append('{0}break;'.format(oldindent))
                 else:
-                    newcode.append('{0}}}'.format(''.join(indents)))
+                    newcode.append('{0}}}{1}'.format(''.join(indents),
+                        ';' if blockrequiressemicolon[-1] else ''))
                 blocksarecase.pop()
+                blockrequiressemicolon.pop()
                 newindent = indentation.search(line)
                 newindent = newindent.group(1) if newindent else ''
                 oldindent = ''.join(indents)
@@ -108,13 +115,10 @@ def transpile(code, includes):
                 print(line)
                 raise RuntimeError('Indentation mismatch!')
 
-        if case.search(line):
+        if startindent.search(line):
             indent += 1
-            blocksarecase.append(True)
-
-        elif startindent.search(line):
-            indent += 1
-            blocksarecase.append(False)
+            blocksarecase.append(case.search(line))
+            blockrequiressemicolon.append(reqsemicolon.search(line))
 
         line = parse_line(line)
         newcode.append(line)

@@ -1,6 +1,6 @@
 # C-Prime
 
-**MILESTONE 5/16/2015: First successful compilation!**
+**MILESTONE 5/16/2015: All basic test programs (`examples/`) compile**
 
 C-Prime is C without all the clutter. Inspired in part by CoffeeScript's
 makeover of JavaScript, C-Prime believes that C can become more beautiful,

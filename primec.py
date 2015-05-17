@@ -25,6 +25,12 @@ reqsemicolon   = re.compile(r'^\s*(struct|enum|union).*?:$')
 
 stringsorchars = re.compile(r'''(".+?[^\\]"|'.+[^\\]')''')
 
+andkeyword     = re.compile(r'(\s)and(\s)')
+orkeyword      = re.compile(r'(\s)or(\s)')
+notkeyword     = re.compile(r'(\s)not(\s)')
+
+parenkeyword   = re.compile(r'(\s*while\s+|\s*if\s+|\s*switch\s+|\s*case\s+)([^\(].*?)(:|$)')
+
 
 def strip_comments(code):
     code = singleline.sub('\n', code)
@@ -42,10 +48,18 @@ def parse_line(line):
     if onelinecase.search(line):
         line = '{0}; break'.format(line)
 
-    if startindent.search(line):
+    line = parenkeyword.sub(r'\g<1>(\g<2>)\g<3>', line)
+
+    if case.search(line):
+        pass
+    elif startindent.search(line):
         line = startindent.sub('', line)
     else:
         line = '{0};'.format(line)
+
+    line = andkeyword.sub(r'\g<1>&&\g<2>', line)
+    line = orkeyword.sub(r'\g<1>||\g<2>', line)
+    line = notkeyword.sub(r'\g<1>!', line)
 
     return line
 

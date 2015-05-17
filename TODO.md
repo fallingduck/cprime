@@ -13,12 +13,9 @@ respective C operators.
 
 List of keywords that need to be parsed/parentheses need to be added to:
 ```
-do
-else
-for
 if
 switch
-case?
+case
 while
 ```
 

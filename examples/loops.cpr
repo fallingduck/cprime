@@ -17,3 +17,8 @@ void loop3():
         // "Hello, World!" is printed one time
         printf("Hello, World!\n")
     while x != 0
+
+int main():
+    loop1()
+    loop2()
+    loop3()

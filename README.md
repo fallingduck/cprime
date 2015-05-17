@@ -1,5 +1,7 @@
 # C-Prime
 
+**MILESTONE 5/16/2015: First successful compilation!**
+
 C-Prime is C without all the clutter. Inspired in part by CoffeeScript's
 makeover of JavaScript, C-Prime believes that C can become more beautiful,
 more readable, and easier to write. C-Prime is not a new language, however. It

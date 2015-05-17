@@ -13,7 +13,7 @@ multiline      = re.compile(r'\/\*.*?\*\/', re.DOTALL) # In C99, comments
 
 preprocess     = re.compile(r'^\s*#')
 include        = re.compile(r'^(\s*)include(\s)')
-cprimeinclude  = re.compile(r'^(\s*)include\s+"(.+?)\.hpr"$')
+cprimeinclude  = re.compile(r'^(\s*)include\s+"(.+?)\.(h|c)pr"$')
 
 indentation    = re.compile(r'^(\s*)\S')
 blankline      = re.compile(r'^\s*$')
@@ -21,9 +21,9 @@ blankline      = re.compile(r'^\s*$')
 case           = re.compile(r'^\s*(case|default).*?:$')
 onelinecase    = re.compile(r'^\s*(case|default).*?:.+$')
 startindent    = re.compile(r':$')
-reqsemicolon   = re.compile(r'^\s*(struct|enum).*?:$')
+reqsemicolon   = re.compile(r'^\s*(struct|enum|union).*?:$')
 
-strings        = re.compile(r'".*?[^\\]"')
+stringsorchars = re.compile(r'''(".+?[^\\]"|'.+[^\\]')''')
 
 
 def strip_comments(code):
@@ -33,13 +33,19 @@ def strip_comments(code):
 
 
 def parse_line(line):
-    """This mostly focusses on adding in parentheses where required, adding
+    """This mostly focuses on adding in parentheses where required, adding
     semicolons where required, and converting keywords like `and`, `or`, and
     `not` to their respective C operators.
     """
+    linesanstrings = stringsorchars.sub('""', line)
 
     if onelinecase.search(line):
-        line = '{0}; break;'.format(line)
+        line = '{0}; break'.format(line)
+
+    if startindent.search(line):
+        line = startindent.sub('', line)
+    else:
+        line = '{0};'.format(line)
 
     return line
 
@@ -135,16 +141,19 @@ def transpile(code, includes):
     return '\n'.join(newcode)
 
 
-def main(filepath):
-    with open(filepath, 'r') as fp:
+def main(infile, outfile=None):
+    with open(infile, 'r') as fp:
         code = fp.read()
     code = strip_comments(code)
     code = escapednewline.sub(' ', code)
     code = code.split('\n')
     includes = []
     included = []  # List of hashes, so we only include anything once
-    newcode = transpile(code, includes)
-    print(newcode)
+    output = transpile(code, includes)
+    if outfile is None:
+        outfile = re.sub(r'^(.+?)(\.\w+)?$', '\g<1>.c', infile)
+    with open(outfile, 'w') as fp:
+        fp.write(output)
 
 
 if __name__ == '__main__':

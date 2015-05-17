@@ -11,6 +11,17 @@ This mostly focusses on adding in parentheses where required, adding semicolons
 where required, and converting keywords like `and`, `or`, and `not` to their
 respective C operators.
 
+List of keywords that need to be parsed/parentheses need to be added to:
+```
+do
+else
+for
+if
+switch
+case?
+while
+```
+
 ### Post-Processing
 1. Handle transpiling includes
 
@@ -48,3 +59,9 @@ those shouldn't be necessary for something like the above code.
 
 Can this be distilled to one or two things to look for? Perhaps code surrounded
 by parentheses and/or lines ending in `;`?
+
+For each loops??? I don't want this to stray from the C grammar, but I think
+that for each would be...interesting...to say the least...
+
+Eventually it would be great if primec could produce C code with comments that
+carry over from the C-Prime code.

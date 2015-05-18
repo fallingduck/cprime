@@ -25,9 +25,10 @@ reqsemicolon   = re.compile(r'^\s*(struct|enum|union).*?:$')
 
 stringsorchars = re.compile(r'''(".+?[^\\]"|'.+[^\\]')''')
 
-andkeyword     = re.compile(r'(\s)and(\s)')
-orkeyword      = re.compile(r'(\s)or(\s)')
-notkeyword     = re.compile(r'(\s)not(\s)')
+andkeyword     = re.compile(r'"[^"]+"|(\band\b)')
+orkeyword      = re.compile(r'"[^"]+"|(\bor\b)')
+andsub = lambda matchobj: '&&' if matchobj.group(1) else matchobj.group(0)
+orsub = lambda matchobj: '||' if matchobj.group(1) else matchobj.group(0)
 
 parenkeyword   = re.compile(r'(\s*while\s+|\s*if\s+|\s*switch\s+|\s*case\s+)([^\(].*?)(:|$)')
 
@@ -57,9 +58,8 @@ def parse_line(line):
     else:
         line = '{0};'.format(line)
 
-    line = andkeyword.sub(r'\g<1>&&\g<2>', line)
-    line = orkeyword.sub(r'\g<1>||\g<2>', line)
-    line = notkeyword.sub(r'\g<1>!', line)
+    line = andkeyword.sub(andsub, line)
+    line = orkeyword.sub(orsub, line)
 
     return line
 

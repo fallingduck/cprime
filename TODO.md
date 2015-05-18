@@ -7,32 +7,16 @@
 8. (DONE) C-Prime preprocessor commands
 
 ### Second Pass
-(DONE) This mostly focusses on adding in parentheses where required, adding
-semicolons where required, and converting keywords like `and`, `or`, and `not`
-to their respective C operators.
-
-(DONE) List of keywords that need to be parsed/parentheses need to be added to:
-```
-if
-switch
-case
-while
-```
+1. (DONE) Add parentheses where required
+2. (DONE) Add semicolons where required
+3. (DONE) Replace `and` and `or` keywords with binary operators
+4. (DONE) Single line block parsing
+5. (DONE) Automatically pass `void` to no-argument function definitions
 
 ### Post-Processing
 1. Handle transpiling includes
 
 ### Comments
-
-Make `linesanstrings` work...
-
-Support for single line code blocks: `if x: printf("Yes!")` or
-`case 3: printf("Three")`
-
-Passing `void` to a function is ugly and pretty much unnecessary, because
-non-specified argument functions are generally not good ideas anyway. I'm going
-the C++ route here, I think, so `void f()` should become `void f(void)` in the
-compiled code.
 
 Eventually it would be great if `primec` could produce C code with comments that
 carry over from the C-Prime code.

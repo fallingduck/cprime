@@ -33,6 +33,8 @@ parensub        = lambda m: '{0}({1}){2}'.format(m.group(1), m.group(2), m.group
 singlelineblock = re.compile(r'"[^"]+"|:(.+)$')
 slbsub          = lambda m: ' {{{0} }}'.format(m.group(1)) if m.group(1) else m.group(0)
 
+voidfunction    = re.compile(r'"[^"]+"|(\(\):)')
+voidsub         = lambda m: '(void):' if m.group(1) else m.group(0)
 
 def strip_comments(code):
     code = singlecomment.sub('\n', code)
@@ -45,6 +47,8 @@ def parse_line(line):
     semicolons where required, and converting keywords like `and`, `or`, and
     `not` to their respective C operators.
     """
+
+    line = voidfunction.sub(voidsub, line)
 
     if onelinecase.search(line):
         line = '{0}; break'.format(line)

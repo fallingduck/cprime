@@ -3,6 +3,7 @@
 
 import re
 import sys
+import os
 
 
 escapednewline  = re.compile(r'\\\n')
@@ -162,15 +163,24 @@ def transpile(code, includes):
     return '\n'.join(newcode)
 
 
-def main(infile, outfile=None):
+def handle_includes(infile, includes):
+    root = os.path.split(infile)[0]
+    for path in includes:
+        filename = os.path.split(path)[1]
+        outfile = re.sub(r'^(.+?)(\.\w+)?$', '\g<1>.h', filename)
+        path = os.path.join(root, path)
+        transpile_file(path, outfile)
+
+
+def transpile_file(infile, outfile=None):
     with open(infile, 'r') as fp:
         code = fp.read()
     code = strip_comments(code)
     code = escapednewline.sub(' ', code)
     code = code.split('\n')
     includes = []
-    included = []  # List of hashes, so we only include anything once
     output = transpile(code, includes)
+    handle_includes(infile, includes)
     if outfile is None:
         outfile = re.sub(r'^(.+?)(\.\w+)?$', '\g<1>.c', infile)
     with open(outfile, 'w') as fp:
@@ -179,4 +189,4 @@ def main(infile, outfile=None):
 
 if __name__ == '__main__':
     infile = sys.argv[1]
-    main(infile)
+    transpile_file(infile)

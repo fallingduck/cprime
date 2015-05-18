@@ -16,8 +16,7 @@ int main():
             printf("OK\n")
         case 3:
             printf("OK\n")
-        case 4:
-            printf("How about a nice game of chess?\n")
+        case 4: printf("How about a nice game of chess?\n")
         default:
             printf("Bye!")
     return 0

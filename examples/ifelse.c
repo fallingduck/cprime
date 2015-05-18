@@ -8,10 +8,7 @@ int main()
     {
         printf("You are pretty young!\n");
     }
-    else if (age == 100)
-    {
-        printf("You are old\n");
-    }
+    else if (age == 100) { printf("You are old\n"); }
     else
     {
         printf("You are really old!\n");

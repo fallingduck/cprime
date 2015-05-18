@@ -10,18 +10,16 @@ int main()
     scanf("%d", &input);
     switch (input)
     {
-        case (1):
+        case 1:
             printf("OK\n");
             break;
-        case (2):
+        case 2:
             printf("OK\n");
             break;
-        case (3):
+        case 3:
             printf("OK\n");
             break;
-        case (4):
-            printf("How about a nice game of chess?\n");
-            break;
+        case 4: printf("How about a nice game of chess?\n"); break;
         default:
             printf("Bye!");
             break;

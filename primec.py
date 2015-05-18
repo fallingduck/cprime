@@ -5,37 +5,38 @@ import re
 import sys
 
 
-escapednewline = re.compile(r'\\\n')
+escapednewline  = re.compile(r'\\\n')
 
-singleline     = re.compile(r'\n?\s*\/{2}.*?\n')
-multiline      = re.compile(r'\/\*.*?\*\/', re.DOTALL) # In C99, comments
-                                                       # don't nest!
+singlecomment   = re.compile(r'\n?\s*\/{2}.*?\n')
+multicomment    = re.compile(r'\/\*.*?\*\/', re.DOTALL)
 
-preprocess     = re.compile(r'^\s*#')
-include        = re.compile(r'^(\s*)include(\s)')
-cprimeinclude  = re.compile(r'^(\s*)include\s+"(.+?)\.(h|c)pr"$')
+preprocess      = re.compile(r'^\s*#')
+include         = re.compile(r'^(\s*)include(\s)')
+cprimeinclude   = re.compile(r'^(\s*)include\s+"(.+?)\.(h|c)pr"$')
 
-indentation    = re.compile(r'^(\s*)\S')
-blankline      = re.compile(r'^\s*$')
+indentation     = re.compile(r'^(\s*)\S')
+blankline       = re.compile(r'^\s*$')
 
-case           = re.compile(r'^\s*(case|default).*?:$')
-onelinecase    = re.compile(r'^\s*(case|default).*?:.+$')
-startindent    = re.compile(r':$')
-reqsemicolon   = re.compile(r'^\s*(struct|enum|union).*?:$')
+case            = re.compile(r'^\s*(case|default).*?:$')
+onelinecase     = re.compile(r'^\s*(case|default).*?:.+$')
+startindent     = re.compile(r':$')
+reqsemicolon    = re.compile(r'^\s*(struct|enum|union).*?:$')
 
-stringsorchars = re.compile(r'''(".+?[^\\]"|'.+[^\\]')''')
+andkeyword      = re.compile(r'"[^"]+"|(\sand\s)')
+andsub          = lambda m: ' && ' if m.group(1) else m.group(0)
+orkeyword       = re.compile(r'"[^"]+"|(\sor\s)')
+orsub           = lambda m: ' || ' if m.group(1) else m.group(0)
 
-andkeyword     = re.compile(r'"[^"]+"|(\band\b)')
-orkeyword      = re.compile(r'"[^"]+"|(\bor\b)')
-andsub = lambda matchobj: '&&' if matchobj.group(1) else matchobj.group(0)
-orsub = lambda matchobj: '||' if matchobj.group(1) else matchobj.group(0)
+parenkeyword    = re.compile(r'"[^"]+"|(\s*while\s+|\s*if\s+|\s*switch\s+)([^\(].*?)(:|$)')
+parensub        = lambda m: '{0}({1}){2}'.format(m.group(1), m.group(2), m.group(3)) if m.group(1) else m.group(0)
 
-parenkeyword   = re.compile(r'(\s*while\s+|\s*if\s+|\s*switch\s+|\s*case\s+)([^\(].*?)(:|$)')
+singlelineblock = re.compile(r'"[^"]+"|:(.+)$')
+slbsub          = lambda m: ' {{{0} }}'.format(m.group(1)) if m.group(1) else m.group(0)
 
 
 def strip_comments(code):
-    code = singleline.sub('\n', code)
-    code = multiline.sub('', code)
+    code = singlecomment.sub('\n', code)
+    code = multicomment.sub('', code)
     return code.rstrip()
 
 
@@ -44,12 +45,11 @@ def parse_line(line):
     semicolons where required, and converting keywords like `and`, `or`, and
     `not` to their respective C operators.
     """
-    linesanstrings = stringsorchars.sub('""', line)
 
     if onelinecase.search(line):
         line = '{0}; break'.format(line)
 
-    line = parenkeyword.sub(r'\g<1>(\g<2>)\g<3>', line)
+    line = parenkeyword.sub(parensub, line)
 
     if case.search(line):
         pass
@@ -57,6 +57,9 @@ def parse_line(line):
         line = startindent.sub('', line)
     else:
         line = '{0};'.format(line)
+
+    if not onelinecase.search(line):
+        line = singlelineblock.sub(slbsub, line)
 
     line = andkeyword.sub(andsub, line)
     line = orkeyword.sub(orsub, line)
